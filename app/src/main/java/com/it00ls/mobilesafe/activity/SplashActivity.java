@@ -3,21 +3,30 @@ package com.it00ls.mobilesafe.activity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.it00ls.mobilesafe.R;
 import com.it00ls.mobilesafe.utils.StreamUtils;
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -36,10 +45,11 @@ public class SplashActivity extends Activity {
     private static final int CODE_NET_ERROR = 3;
     private static final int CODE_JSON_ERROR = 4;
 
-    private String mVersionName;
-    private int mVersionCode;
-    private String mDescription;
-    private String mDownloadUrl;
+    // 服务器返回的信息
+    private String mVersionName; // 版本名
+    private int mVersionCode; // 版本号
+    private String mDescription; // 版本信息
+    private String mDownloadUrl; // 下载地址
 
     private Handler handler = new Handler() {
         @Override
@@ -50,14 +60,18 @@ public class SplashActivity extends Activity {
                     break;
                 case CODE_URL_ERROR:
                     Toast.makeText(SplashActivity.this, "URL错误", Toast.LENGTH_SHORT);
+                    enterHome();
                     break;
                 case CODE_NET_ERROR:
                     Toast.makeText(SplashActivity.this, "网络错误", Toast.LENGTH_SHORT);
+                    enterHome();
                     break;
                 case CODE_JSON_ERROR:
                     Toast.makeText(SplashActivity.this, "数据解析错误", Toast.LENGTH_SHORT);
+                    enterHome();
                     break;
                 case CODE_ENTER_HOME:
+                    enterHome();
                     break;
             }
         }
@@ -109,13 +123,14 @@ public class SplashActivity extends Activity {
      * 从服务器获取版本信息进行校验
      */
     private void checkVersion() {
+        final long startTime = System.currentTimeMillis();
         new Thread() {
             @Override
             public void run() {
                 HttpURLConnection conn = null;
                 Message msg = Message.obtain();
                 try {
-                    URL url = new URL("http://192.168.6.1/update.json");
+                    URL url = new URL("http://120.203.57.245/update.json");
                     conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestMethod("GET"); // 设置请求方式
                     conn.setConnectTimeout(5000); // 设置连接超时
@@ -155,11 +170,20 @@ public class SplashActivity extends Activity {
                     msg.what = CODE_JSON_ERROR;
                     e.printStackTrace();
                 } finally {
+                    long endTime = System.currentTimeMillis();
+                    long useTime = endTime - startTime;
+                    if (useTime < 2000) {
+                        try {
+                            Thread.sleep(2000 - useTime);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     handler.sendMessage(msg);
-//                    Log.d("SplashActivity", "有更新");
                     if (conn != null) {
                         conn.disconnect();
                     }
+
                 }
             }
         }.start();
@@ -176,9 +200,78 @@ public class SplashActivity extends Activity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Log.d("showUpdateDailog", "立即更新");
+                download();
             }
         });
-        builder.setNegativeButton("稍后再说", null);
+        builder.setNegativeButton("稍后再说", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                enterHome();
+            }
+        });
+        builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                enterHome();
+            }
+        });
         builder.show();
+    }
+
+    /**
+     * 下载apk文件
+     */
+    private void download() {
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            HttpUtils httpUtils = new HttpUtils();
+            String target = Environment.getExternalStorageDirectory() + "/Download/update.apk";
+            final TextView tv_progress = (TextView) findViewById(R.id.tv_progress);
+            tv_progress.setVisibility(View.VISIBLE);
+            httpUtils.download(mDownloadUrl, target, new RequestCallBack<File>() {
+                @Override
+                public void onLoading(long total, long current, boolean isUploading) {
+                    Log.d("download", current + "/" + total);
+                    tv_progress.setText("下载进度:" + current * 100 / total + "%");
+                }
+
+                @Override
+                public void onSuccess(ResponseInfo<File> responseInfo) {
+                    Toast.makeText(SplashActivity.this, "下载成功", Toast.LENGTH_SHORT).show();
+                    // 跳转到安装页面
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setDataAndType(Uri.fromFile(responseInfo.result),
+                            "application/vnd.android.package-archive");
+                    startActivityForResult(intent, 0);
+                }
+
+                @Override
+                public void onFailure(HttpException e, String s) {
+                    Toast.makeText(SplashActivity.this, "下载失败", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Toast.makeText(SplashActivity.this, "未找到SD卡", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * 用户取消安装，回调此方法
+     *
+     * @param requestCode 请求码
+     * @param resultCode  返回码
+     * @param data        意图
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        enterHome();
+    }
+
+    /**
+     * 进入主页面
+     */
+    private void enterHome() {
+        Intent intent = new Intent(this, HomeActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

@@ -11,6 +11,7 @@ public class StreamUtils {
 
     /**
      * 读取流中的数据
+     *
      * @param is 字节输入流
      * @return 返回流中的数据
      * @throws IOException
