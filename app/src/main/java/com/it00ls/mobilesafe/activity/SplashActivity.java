@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,6 +34,8 @@ import java.net.URL;
 
 
 /**
+ * 闪屏界面
+ *
  * @author it00ls
  */
 public class SplashActivity extends Activity {
@@ -59,15 +60,15 @@ public class SplashActivity extends Activity {
                     showUpdateDailog();
                     break;
                 case CODE_URL_ERROR:
-                    Toast.makeText(SplashActivity.this, "URL错误", Toast.LENGTH_SHORT);
+                    Toast.makeText(SplashActivity.this, "URL错误", Toast.LENGTH_SHORT).show();
                     enterHome();
                     break;
                 case CODE_NET_ERROR:
-                    Toast.makeText(SplashActivity.this, "网络错误", Toast.LENGTH_SHORT);
+                    Toast.makeText(SplashActivity.this, "网络错误", Toast.LENGTH_SHORT).show();
                     enterHome();
                     break;
                 case CODE_JSON_ERROR:
-                    Toast.makeText(SplashActivity.this, "数据解析错误", Toast.LENGTH_SHORT);
+                    Toast.makeText(SplashActivity.this, "数据解析错误", Toast.LENGTH_SHORT).show();
                     enterHome();
                     break;
                 case CODE_ENTER_HOME:
@@ -82,6 +83,7 @@ public class SplashActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
+        // 获取版本信息
         TextView tv_version = (TextView) findViewById(R.id.tv_version);
         tv_version.setText("版本:" + getVersionName());
         checkVersion();
@@ -130,30 +132,26 @@ public class SplashActivity extends Activity {
                 HttpURLConnection conn = null;
                 Message msg = Message.obtain();
                 try {
-                    URL url = new URL("http://120.203.57.245/update.json");
+                    URL url = new URL("http://192.168.6.1/update.json");
                     conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestMethod("GET"); // 设置请求方式
                     conn.setConnectTimeout(5000); // 设置连接超时
                     conn.setReadTimeout(5000); // 设置读取超时
-                    conn.connect(); // 建立连接
                     if (conn.getResponseCode() == 200) {
                         InputStream is = conn.getInputStream();
                         String result = StreamUtils.readFromStream(is); // 获取服务器JSON信息
                         // 解析JSON
                         JSONObject json = new JSONObject(result);
                         mVersionName = json.getString("versionName");
-
                         mVersionCode = json.getInt("versionCode");
-
                         mDescription = json.getString("description");
-
                         mDownloadUrl = json.getString("downloadUrl");
                         // 校验版本
                         if (mVersionCode > getVersionCode()) {
                             // 有更新，弹出对话框
                             msg.what = CODE_UPDATE_DAILOG;
                         } else {
-                            // 没有更新
+                            // 没有更新，进入主界面
                             msg.what = CODE_ENTER_HOME;
                         }
                     }
@@ -171,7 +169,8 @@ public class SplashActivity extends Activity {
                     e.printStackTrace();
                 } finally {
                     long endTime = System.currentTimeMillis();
-                    long useTime = endTime - startTime;
+                    long useTime = endTime - startTime; // 计算子线程运行时间
+                    // 使闪屏页面至少停留2秒
                     if (useTime < 2000) {
                         try {
                             Thread.sleep(2000 - useTime);
@@ -193,13 +192,13 @@ public class SplashActivity extends Activity {
      * 弹出升级对话框
      */
     private void showUpdateDailog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("最新版本:" + mVersionName);
-        builder.setMessage(mDescription);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this); // 创建弹出对话框的builder对象
+        builder.setTitle("最新版本:" + mVersionName); // 设置对话框标题
+        builder.setMessage(mDescription); // 设置对话框内容
+        // 设置对话框按钮的点击事件
         builder.setPositiveButton("立即更新", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Log.d("showUpdateDailog", "立即更新");
                 download();
             }
         });
@@ -209,28 +208,31 @@ public class SplashActivity extends Activity {
                 enterHome();
             }
         });
+        // 若用户按返回键则直接进入主界面
         builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
                 enterHome();
             }
         });
-        builder.show();
+        builder.show(); // 显示对话框
     }
 
     /**
      * 下载apk文件
      */
     private void download() {
+        // 首先判断手机内存卡是否可用
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            // xUtils第三方插件
             HttpUtils httpUtils = new HttpUtils();
+            // 将apk下载到什么位置
             String target = Environment.getExternalStorageDirectory() + "/Download/update.apk";
             final TextView tv_progress = (TextView) findViewById(R.id.tv_progress);
-            tv_progress.setVisibility(View.VISIBLE);
+            tv_progress.setVisibility(View.VISIBLE); // 设置文本框属性为显示
             httpUtils.download(mDownloadUrl, target, new RequestCallBack<File>() {
                 @Override
                 public void onLoading(long total, long current, boolean isUploading) {
-                    Log.d("download", current + "/" + total);
                     tv_progress.setText("下载进度:" + current * 100 / total + "%");
                 }
 
