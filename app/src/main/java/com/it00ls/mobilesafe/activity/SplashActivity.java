@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -52,7 +53,7 @@ public class SplashActivity extends Activity {
     private String mDescription; // 版本信息
     private String mDownloadUrl; // 下载地址
 
-    private Handler handler = new Handler() {
+    private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
@@ -86,7 +87,14 @@ public class SplashActivity extends Activity {
         // 获取版本信息
         TextView tv_version = (TextView) findViewById(R.id.tv_version);
         tv_version.setText("版本:" + getVersionName());
-        checkVersion();
+        SharedPreferences mPref = getSharedPreferences("Setting_Config", MODE_PRIVATE);
+        boolean auto_update = mPref.getBoolean("auto_update", true);
+        if (auto_update) {
+            checkVersion();
+        } else {
+            mHandler.sendEmptyMessageDelayed(CODE_ENTER_HOME, 2000);
+        }
+
     }
 
     /**
@@ -178,7 +186,7 @@ public class SplashActivity extends Activity {
                             e.printStackTrace();
                         }
                     }
-                    handler.sendMessage(msg);
+                    mHandler.sendMessage(msg);
                     if (conn != null) {
                         conn.disconnect();
                     }
