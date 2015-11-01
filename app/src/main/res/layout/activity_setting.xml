@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:it00ls="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -11,5 +12,8 @@
     <com.it00ls.mobilesafe.view.SettingItemView
         android:id="@+id/sivUpdate"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        it00ls:desc_off="自动更新已关闭"
+        it00ls:desc_on="自动更新已开启"
+        it00ls:siv_title="自动更新设置" />
 </LinearLayout>

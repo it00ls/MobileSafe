@@ -9,18 +9,20 @@ import android.widget.TextView;
 
 import com.it00ls.mobilesafe.R;
 
-import org.w3c.dom.Text;
-
 /**
- * 设置中心条目
+ * 设置中心自定义组合控件
  *
  * @author it00ls
  */
 public class SettingItemView extends RelativeLayout {
 
+    private static final String NAMESPACE = "http://schemas.android.com/apk/res-auto";
     private TextView tv_title;
     private TextView tv_desc;
     private CheckBox cb_check;
+    private String mTitle;
+    private String mDescOn;
+    private String mDescOff;
 
     public SettingItemView(Context context) {
         super(context);
@@ -29,6 +31,10 @@ public class SettingItemView extends RelativeLayout {
 
     public SettingItemView(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        mTitle = attrs.getAttributeValue(NAMESPACE, "siv_title");
+        mDescOn = attrs.getAttributeValue(NAMESPACE, "desc_on");
+        mDescOff = attrs.getAttributeValue(NAMESPACE, "desc_off");
         initView();
     }
 
@@ -42,6 +48,8 @@ public class SettingItemView extends RelativeLayout {
         tv_title = (TextView) findViewById(R.id.tv_title);
         tv_desc = (TextView) findViewById(R.id.tv_desc);
         cb_check = (CheckBox) findViewById(R.id.cb_check);
+
+        setTitle(mTitle);
     }
 
     /**
@@ -78,5 +86,10 @@ public class SettingItemView extends RelativeLayout {
      */
     public void setChecked(boolean check) {
         cb_check.setChecked(check);
+        if (check) {
+            setDesc(mDescOn);
+        } else {
+            setDesc(mDescOff);
+        }
     }
 }
