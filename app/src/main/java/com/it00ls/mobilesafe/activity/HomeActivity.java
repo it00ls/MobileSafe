@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -18,6 +19,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.it00ls.mobilesafe.R;
+import com.it00ls.mobilesafe.utils.MD5Utils;
+
+import org.w3c.dom.Text;
 
 /**
  * 主界面
@@ -29,6 +33,7 @@ public class HomeActivity extends Activity {
     private static final int HOME_SETTINGS = 8;
     private static final int HOME_SAFE = 0;
     private GridView gv_home;
+    private SharedPreferences mPref;
     private String[] mItems = new String[]{"手机防盗", "通讯卫士", "软件管理", "进程管理",
             "流量统计", "手机杀毒", "缓存清理", "高级工具", "设置中心"};
     private int[] mPics = new int[]{R.drawable.home_safe,
@@ -66,18 +71,59 @@ public class HomeActivity extends Activity {
      */
     private void showPasswordDialog() {
         // 判断是否有设置密码
-        // 未设置密码则弹出设置密码对话框
-        showSetPasswordDialog();
+        mPref = getSharedPreferences("config", MODE_PRIVATE);
+        String password = mPref.getString("password", null);
+        if (!TextUtils.isEmpty(password)) {
+            // 有密码则弹出输入密码对话框
+            showGetPasswordDialog(password);
+        } else {
+            // 未设置密码则弹出设置密码对话框
+            showSetPasswordDialog();
+        }
+    }
+
+    /**
+     * 弹出校验密码对话框
+     */
+    private void showGetPasswordDialog(final String password) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final AlertDialog dialog = builder.create();
+        final View view = View.inflate(this, R.layout.dialog_get_password, null);
+        dialog.setView(view, 0, 0, 0, 0);
+        // 设置确定按钮点击侦听
+        Button btn_ok = (Button) view.findViewById(R.id.btn_ok);
+        btn_ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText et_password = (EditText) view.findViewById(R.id.et_password);
+                String pass = et_password.getText().toString();
+                if (password.equals(MD5Utils.encode(pass))) {
+                    Toast.makeText(HomeActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                } else {
+                    Toast.makeText(HomeActivity.this, "密码错误", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        // 设置取消按钮点击侦听
+        Button btn_cancel = (Button) view.findViewById(R.id.btn_cancel);
+        btn_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
     }
 
     /**
      * 弹出设置密码对话框
      */
     private void showSetPasswordDialog() {
-        AlertDialog.Builder mBuilder = new AlertDialog.Builder(this);
-        final AlertDialog mDialog = mBuilder.create();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final AlertDialog dialog = builder.create();
         final View view = View.inflate(this, R.layout.dialog_set_password, null);
-        mDialog.setView(view, 0, 0, 0, 0);
+        dialog.setView(view, 0, 0, 0, 0);
 
         // 设置确定按钮点击侦听
         Button btn_ok = (Button) view.findViewById(R.id.btn_ok);
@@ -88,9 +134,11 @@ public class HomeActivity extends Activity {
                 EditText et_repassword = (EditText) view.findViewById(R.id.et_repassword);
                 String password = et_password.getText().toString();
                 String repassword = et_repassword.getText().toString();
-                if (!TextUtils.isEmpty(password)) {
+                if (!TextUtils.isEmpty(repassword)) {
                     if (password.equals(repassword)) {
                         Toast.makeText(HomeActivity.this, "设置成功", Toast.LENGTH_SHORT).show();
+                        mPref.edit().putString("password", MD5Utils.encode(password)).commit();
+                        dialog.dismiss();
                     } else {
                         Toast.makeText(HomeActivity.this, "两次密码不一致", Toast.LENGTH_SHORT).show();
                     }
@@ -104,10 +152,10 @@ public class HomeActivity extends Activity {
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mDialog.dismiss();
+                dialog.dismiss();
             }
         });
-        mDialog.show();
+        dialog.show();
     }
 
     class HomeAdapter extends BaseAdapter {

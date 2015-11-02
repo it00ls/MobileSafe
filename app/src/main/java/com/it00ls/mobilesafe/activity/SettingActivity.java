@@ -24,7 +24,7 @@ public class SettingActivity extends Activity {
         setContentView(R.layout.activity_setting);
 
         sivUpdate = (SettingItemView) findViewById(R.id.sivUpdate);
-        mPref = getSharedPreferences("Setting_Config", MODE_PRIVATE);
+        mPref = getSharedPreferences("config", MODE_PRIVATE);
         boolean auto_update = mPref.getBoolean("auto_update", true);
         if (auto_update) {
             sivUpdate.setChecked(true);

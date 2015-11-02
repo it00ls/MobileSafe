@@ -90,18 +90,18 @@ public class SplashActivity extends Activity {
         TextView tv_version = (TextView) findViewById(R.id.tv_version);
         String version = "版本:" + getVersionName();
         tv_version.setText(version);
-        SharedPreferences mPref = getSharedPreferences("Setting_Config", MODE_PRIVATE);
-        boolean auto_update = mPref.getBoolean("auto_update", true);
+        SharedPreferences preferences = getSharedPreferences("config", MODE_PRIVATE);
+        boolean auto_update = preferences.getBoolean("auto_update", true);
         if (auto_update) {
             checkVersion();
         } else {
             mHandler.sendEmptyMessageDelayed(CODE_ENTER_HOME, 2000);
         }
         // 设置渐变效果
-        AlphaAnimation mAnimation = new AlphaAnimation(0.3f, 1f);
-        mAnimation.setDuration(2000); // 延时2秒
+        AlphaAnimation animation = new AlphaAnimation(0.3f, 1f);
+        animation.setDuration(2000); // 延时2秒
         RelativeLayout rl_root = (RelativeLayout) findViewById(R.id.rl_root);
-        rl_root.startAnimation(mAnimation);
+        rl_root.startAnimation(animation);
     }
 
     /**
