@@ -2,7 +2,6 @@ package com.it00ls.mobilesafe.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -20,8 +19,6 @@ import android.widget.Toast;
 
 import com.it00ls.mobilesafe.R;
 import com.it00ls.mobilesafe.utils.MD5Utils;
-
-import org.w3c.dom.Text;
 
 /**
  * 主界面
@@ -59,7 +56,7 @@ public class HomeActivity extends Activity {
                         break;
                     case HOME_SETTINGS:
                         // 设置中心
-                        startActivity(new Intent(HomeActivity.this, SettingActivity.class));
+                        startActivity(new Intent(HomeActivity.this, SettingsActivity.class));
                         break;
                 }
             }
@@ -98,8 +95,8 @@ public class HomeActivity extends Activity {
                 EditText et_password = (EditText) view.findViewById(R.id.et_password);
                 String pass = et_password.getText().toString();
                 if (password.equals(MD5Utils.encode(pass))) {
-                    Toast.makeText(HomeActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
                     dialog.dismiss();
+                    startActivity(new Intent(HomeActivity.this, SafeActivity.class));
                 } else {
                     Toast.makeText(HomeActivity.this, "密码错误", Toast.LENGTH_SHORT).show();
                 }
@@ -136,9 +133,9 @@ public class HomeActivity extends Activity {
                 String repassword = et_repassword.getText().toString();
                 if (!TextUtils.isEmpty(repassword)) {
                     if (password.equals(repassword)) {
-                        Toast.makeText(HomeActivity.this, "设置成功", Toast.LENGTH_SHORT).show();
                         mPref.edit().putString("password", MD5Utils.encode(password)).commit();
                         dialog.dismiss();
+                        startActivity(new Intent(HomeActivity.this, SafeActivity.class));
                     } else {
                         Toast.makeText(HomeActivity.this, "两次密码不一致", Toast.LENGTH_SHORT).show();
                     }

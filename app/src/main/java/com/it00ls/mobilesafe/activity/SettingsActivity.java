@@ -13,7 +13,7 @@ import com.it00ls.mobilesafe.view.SettingItemView;
  *
  * @author it00ls
  */
-public class SettingActivity extends Activity {
+public class SettingsActivity extends Activity {
 
     private SettingItemView sivUpdate;
     private SharedPreferences mPref;
