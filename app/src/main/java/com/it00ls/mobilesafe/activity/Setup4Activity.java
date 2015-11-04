@@ -18,6 +18,7 @@ public class Setup4Activity extends Activity {
 
     public void previous(View view) {
         startActivity(new Intent(this, Setup3Activity.class));
+        overridePendingTransition(R.anim.translate_in_previous, R.anim.translate_out_previous);
         finish();
     }
 
@@ -25,6 +26,7 @@ public class Setup4Activity extends Activity {
         SharedPreferences preferences = getSharedPreferences("config", MODE_PRIVATE);
         preferences.edit().putBoolean("safe", true).commit();
         startActivity(new Intent(this, SafeActivity.class));
+        overridePendingTransition(R.anim.translate_in_next, R.anim.translate_out_next);
         finish();
     }
 }

@@ -17,11 +17,13 @@ public class Setup2Activity extends Activity {
 
     public void previous(View view) {
         startActivity(new Intent(this, Setup1Activity.class));
+        overridePendingTransition(R.anim.translate_in_previous, R.anim.translate_out_previous);
         finish();
     }
 
     public void next(View view) {
         startActivity(new Intent(this, Setup3Activity.class));
+        overridePendingTransition(R.anim.translate_in_next, R.anim.translate_out_next);
         finish();
     }
 }

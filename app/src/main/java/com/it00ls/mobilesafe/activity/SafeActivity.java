@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.View;
 
 import com.it00ls.mobilesafe.R;
 
@@ -20,5 +21,10 @@ public class SafeActivity extends Activity {
             startActivity(new Intent(this, Setup1Activity.class));
             finish();
         }
+    }
+
+    public void reEnter(View view) {
+        startActivity(new Intent(this, Setup1Activity.class));
+        finish();
     }
 }
