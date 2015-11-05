@@ -8,7 +8,7 @@ import android.view.View;
 
 import com.it00ls.mobilesafe.R;
 
-public class Setup4Activity extends Activity {
+public class Setup4Activity extends BaseSetupActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,14 +17,23 @@ public class Setup4Activity extends Activity {
     }
 
     public void previous(View view) {
+        showPreviousPage();
+    }
+
+    public void next(View view) {
+        showNextPage();
+    }
+
+    @Override
+    public void showPreviousPage() {
         startActivity(new Intent(this, Setup3Activity.class));
         overridePendingTransition(R.anim.translate_in_previous, R.anim.translate_out_previous);
         finish();
     }
 
-    public void next(View view) {
-        SharedPreferences preferences = getSharedPreferences("config", MODE_PRIVATE);
-        preferences.edit().putBoolean("safe", true).commit();
+    @Override
+    public void showNextPage() {
+        mPref.edit().putBoolean("safe", true).commit();
         startActivity(new Intent(this, SafeActivity.class));
         overridePendingTransition(R.anim.translate_in_next, R.anim.translate_out_next);
         finish();

@@ -15,7 +15,7 @@ import com.it00ls.mobilesafe.view.SettingItemView;
  */
 public class SettingsActivity extends Activity {
 
-    private SettingItemView sivUpdate;
+    private SettingItemView siv_Update;
     private SharedPreferences mPref;
 
     @Override
@@ -23,25 +23,25 @@ public class SettingsActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
 
-        sivUpdate = (SettingItemView) findViewById(R.id.sivUpdate);
+        siv_Update = (SettingItemView) findViewById(R.id.siv_Update);
         mPref = getSharedPreferences("config", MODE_PRIVATE);
         boolean auto_update = mPref.getBoolean("auto_update", true);
         if (auto_update) {
-            sivUpdate.setChecked(true);
+            siv_Update.setChecked(true);
         } else {
-            sivUpdate.setChecked(false);
+            siv_Update.setChecked(false);
         }
 
-        sivUpdate.setOnClickListener(new View.OnClickListener() {
+        siv_Update.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                if (sivUpdate.isCheck()) {
+            public void onClick(View view) {
+                if (siv_Update.isCheck()) {
                     // 已勾选
-                    sivUpdate.setChecked(false);
+                    siv_Update.setChecked(false);
                     mPref.edit().putBoolean("auto_update", false).commit();
                 } else {
                     // 未勾选
-                    sivUpdate.setChecked(true);
+                    siv_Update.setChecked(true);
                     mPref.edit().putBoolean("auto_update", true).commit();
                 }
             }

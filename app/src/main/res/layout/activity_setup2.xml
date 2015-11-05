@@ -22,12 +22,13 @@
         android:text="就会发送报警短信" />
 
     <com.it00ls.mobilesafe.view.SettingItemView
+        android:id="@+id/siv_sim"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="20dp"
-        it00ls:desc_off="SIM卡已经绑定"
-        it00ls:desc_on="SIM卡没有绑定"
+        it00ls:desc_off="SIM卡没有绑定"
+        it00ls:desc_on="SIM卡已经绑定"
         it00ls:siv_title="点击绑定SIM卡" />
 
     <LinearLayout

@@ -57,7 +57,7 @@ public class SettingItemView extends RelativeLayout {
      *
      * @param title 标题
      */
-    public void setTitle(String title) {
+    private void setTitle(String title) {
         tv_title.setText(title);
     }
 
@@ -66,7 +66,7 @@ public class SettingItemView extends RelativeLayout {
      *
      * @param desc 描述
      */
-    public void setDesc(String desc) {
+    private void setDesc(String desc) {
         tv_desc.setText(desc);
     }
 
