@@ -36,4 +36,5 @@
         android:layout_below="@id/tv_desc"
         android:layout_marginTop="5dp"
         android:background="#aa000000" />
+
 </RelativeLayout>
