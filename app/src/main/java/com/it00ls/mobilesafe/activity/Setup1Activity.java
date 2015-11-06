@@ -15,10 +15,6 @@ public class Setup1Activity extends BaseSetupActivity {
         setContentView(R.layout.activity_setup1);
     }
 
-    public void next(View view) {
-        showNextPage();
-    }
-
     @Override
     public void showPreviousPage() {
 

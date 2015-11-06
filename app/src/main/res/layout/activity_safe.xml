@@ -21,6 +21,7 @@
             android:textSize="22sp" />
 
         <TextView
+            android:id="@+id/tv_safe_phone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -48,11 +49,12 @@
             android:textSize="22sp" />
 
         <ImageView
+            android:id="@+id/iv_protect"
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:background="@drawable/lock" />
+            android:src="@drawable/lock" />
     </RelativeLayout>
 
     <ImageView

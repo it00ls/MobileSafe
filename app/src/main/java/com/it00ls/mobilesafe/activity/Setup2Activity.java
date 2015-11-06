@@ -8,18 +8,22 @@ import android.text.TextUtils;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import com.it00ls.mobilesafe.R;
 import com.it00ls.mobilesafe.view.SettingItemView;
 
 public class Setup2Activity extends BaseSetupActivity {
 
+    private SettingItemView siv_sim;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setup2);
 
-        final SettingItemView siv_sim = (SettingItemView) findViewById(R.id.siv_sim);
+
+        siv_sim = (SettingItemView) findViewById(R.id.siv_sim);
         String sim = mPref.getString("sim", null);
         if (!TextUtils.isEmpty(sim)) {
             siv_sim.setChecked(true);
@@ -31,7 +35,7 @@ public class Setup2Activity extends BaseSetupActivity {
             public void onClick(View view) {
                 if (siv_sim.isCheck()) {
                     siv_sim.setChecked(false);
-                    mPref.edit().remove("sim");
+                    mPref.edit().remove("sim").commit();
                 } else {
                     siv_sim.setChecked(true);
                     // 获取sim卡序列号
@@ -52,8 +56,12 @@ public class Setup2Activity extends BaseSetupActivity {
 
     @Override
     public void showNextPage() {
-        startActivity(new Intent(this, Setup3Activity.class));
-        overridePendingTransition(R.anim.translate_in_next, R.anim.translate_out_next);
-        finish();
+        if (!TextUtils.isEmpty(mPref.getString("sim", ""))) {
+            startActivity(new Intent(this, Setup3Activity.class));
+            overridePendingTransition(R.anim.translate_in_next, R.anim.translate_out_next);
+            finish();
+        } else {
+            Toast.makeText(this, "必须绑定SIM卡", Toast.LENGTH_SHORT).show();
+        }
     }
 }
