@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -40,8 +41,14 @@ public class ContactActivity extends Activity {
         });
     }
 
+    /**
+     * 获取联系人并存入ArrayList
+     *
+     * @return ArrayList
+     */
     private ArrayList<Map<String, String>> readContact() {
-        ContentResolver cr = getContentResolver();
+        ContentResolver cr = getContentResolver(); // 创建内容查询者对象
+        // 查询contact_id
         Cursor idCursor = cr.query(Uri.parse("content://com.android.contacts/raw_contacts"),
                 new String[]{"contact_id"},
                 null, null, null);
@@ -49,21 +56,24 @@ public class ContactActivity extends Activity {
         if (idCursor != null) {
             while (idCursor.moveToNext()) {
                 String contact_id = idCursor.getString(idCursor.getColumnIndex("contact_id"));
-                Cursor cursor = cr.query(Uri.parse("content://com.android.contacts/data"),
-                        new String[]{"data1", "mimetype"}, "raw_contact_id = ?",
-                        new String[]{contact_id}, null);
-                if (cursor != null) {
-                    Map<String, String> map = new HashMap<>();
-                    while (cursor.moveToNext()) {
-                        String data1 = cursor.getString(cursor.getColumnIndex("data1"));
-                        String mimetype = cursor.getString(cursor.getColumnIndex("mimetype"));
-                        if (mimetype.equals("vnd.android.cursor.item/name")) {
-                            map.put("name", data1);
-                        } else if (mimetype.equals("vnd.android.cursor.item/phone_v2")) {
-                            map.put("phone", data1);
+                if (!TextUtils.isEmpty(contact_id)) {
+                    // 查询名字及号码
+                    Cursor cursor = cr.query(Uri.parse("content://com.android.contacts/data"),
+                            new String[]{"data1", "mimetype"}, "raw_contact_id = ?",
+                            new String[]{contact_id}, null);
+                    if (cursor != null) {
+                        Map<String, String> map = new HashMap<>();
+                        while (cursor.moveToNext()) {
+                            String data1 = cursor.getString(cursor.getColumnIndex("data1"));
+                            String mimetype = cursor.getString(cursor.getColumnIndex("mimetype"));
+                            if (mimetype.equals("vnd.android.cursor.item/name")) {
+                                map.put("name", data1);
+                            } else if (mimetype.equals("vnd.android.cursor.item/phone_v2")) {
+                                map.put("phone", data1);
+                            }
                         }
+                        contactList.add(map);
                     }
-                    contactList.add(map);
                 }
             }
         }

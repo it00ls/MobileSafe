@@ -102,9 +102,9 @@
 
     <TextView
         style="@style/StarStyle"
-        android:text="GPS追踪：#*wipedata*#" />
+        android:text="远程删除数据：#*wipedata*#" />
 
     <TextView
         style="@style/StarStyle"
-        android:text="GPS追踪：#*lockscreen*#" />
+        android:text="远程锁屏：#*lockscreen*#" />
 </LinearLayout>
